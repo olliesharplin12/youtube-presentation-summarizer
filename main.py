@@ -28,8 +28,8 @@ TODO = [
 ]
 
 
-# GEMINI_MODEL = "gemini-3.6-flash"
-GEMINI_MODEL = "gemini-3.5-flash-lite"
+GEMINI_MODEL = "gemini-3.6-flash"
+# GEMINI_MODEL = "gemini-3.5-flash-lite"
 
 IMAGE_NAME_PREFIX = "z_slide"
 IMAGE_OUTPUT_FORMAT = ".jpg"
@@ -134,7 +134,7 @@ def generate_ai_summary(transcript_text: str, video_title: str) -> tuple[bool, s
     return False, "AI Summary failed: Exceeded maximum API retries."
 
 
-def process_video(url: str) -> None:
+def process_video(url: str, output_dir: str) -> None:
     print("\n" + "=" * 60)
     print(f"Processing URL: {url}")
     print("=" * 60)
@@ -162,7 +162,7 @@ def process_video(url: str) -> None:
     raw_title = info.get("title", "Untitled_Video")
     clean_title = sanitize_filename(raw_title)
 
-    folder_name = f"{yymmdd} - {clean_title}"
+    folder_name = os.path.join(output_dir, f"{yymmdd} - {clean_title}")
     os.makedirs(folder_name, exist_ok=True)
     print(f"[+] Output directory: {folder_name}")
 
@@ -234,8 +234,16 @@ def main():
         description="Download YouTube videos, extract slide screenshots, and generate AI topic summaries."
     )
     parser.add_argument("urls", nargs="+", help="One or more YouTube video URLs.")
+    parser.add_argument(
+        "-o",
+        "--output-dir",
+        default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "output"),
+        help="Directory to store results in (default: 'output' folder inside the repository).",
+    )
 
     args = parser.parse_args()
+
+    os.makedirs(args.output_dir, exist_ok=True)
 
     if len(TODO) > 0:
         print("\n---------- TODOs: ----------")
@@ -247,7 +255,7 @@ def main():
     has_errors = False
     results = []
     for url in args.urls:
-        error = process_video(url)
+        error = process_video(url, args.output_dir)
         results.append((url, error))
         if error is not None:
             has_errors = True
@@ -259,7 +267,7 @@ def main():
         for result in results:
             url, error = result
             if error is not None:
-                print(f"{url} ERROR: {error}")
+                print(f"ERROR {url}:  {error}")
 
 
 if __name__ == "__main__":

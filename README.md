@@ -20,7 +20,7 @@ An automated Python pipeline that downloads YouTube presentation videos, extract
    - **macOS:** `brew install ffmpeg`
    - **Linux:** `sudo apt install ffmpeg`
 3. **Gemini API Key**:
-   - Sign in to Google AI Studio and click Get API key to generate a key.
+   - Sign in to [Google AI Studio](https://aistudio.google.com/api-keys) and click Get API key to generate a key.
    - In CMD, run: `set GEMINI_API_KEY=your_actual_api_key_here`
    - Restart the Shell
 
